@@ -21,12 +21,21 @@ signal vector_aux: std_logic_vector (11 downto 0);
 signal estado: std_logic_vector (1 downto 0);
 signal cont_bits: integer range 0 to 3;
 
-begin
+signal cont: integer range 0 to 100000000;
 
-led(11 downto 0)<=vector_aux;
+begin
 
 process(clk, inicio)
 begin
+if inicio='1' then
+    cont<=0;
+elsif rising_edge(clk) then
+    if cont=100000000 then
+        cont<=0;
+    else
+        cont<=cont+1;
+    end if;
+end if;
 end process;                        
 
 process(clk, inicio)
@@ -39,13 +48,14 @@ if inicio='1' then
     decenas<="0011";
     fin<='0';
 elsif rising_edge(clk) then
+--if cont=0 then
     case estado is
     when "00" =>    cont_bits<=0;
                     fin<='0';
                     vector_aux<="00000000"&sw;
                     if enable='1' then
                         estado<="01";
-                    end if;        
+                    end if;
     when "01" =>    cont_bits<=cont_bits+1;
                     fin<='0';
                     vector_aux<=vector_aux(10 downto 0)&'0';
@@ -73,6 +83,7 @@ elsif rising_edge(clk) then
                     estado<="00";
     end case;
 end if;
-end process;
+--end if;
+end process;                                              
 
 end Behavioral;

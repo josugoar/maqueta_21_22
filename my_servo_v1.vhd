@@ -3,17 +3,16 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 use IEEE.std_logic_unsigned.all;
 
-entity servo is
+entity my_servo_v1 is
 port(
 clk: in std_logic;
-reset: in std_logic;
+inicio: in std_logic;
 selector: in std_logic_vector (3 downto 0);
-tipo_servo: in std_logic_vector (2 downto 0);
 servo_pwm: out std_logic
 );
-end servo;
+end my_servo_v1;
 
-architecture Behavioral of servo is
+architecture Behavioral of my_servo_v1 is
 
 signal contador_base: integer range 0 to 2500000;
 signal pwm_tope: integer range 0 to 12500000;
@@ -25,6 +24,8 @@ signal frecuencia_pwm: integer range 0 to 1000; -- en Hz
 type nombre_estados is (EST_RESET, START, A_UNO, A_CERO, T2);
 signal estado: nombre_estados;
 
+signal tipo_servo: std_logic_vector (2 downto 0);
+
 
 begin
 
@@ -32,6 +33,8 @@ frecuencia_clk<=100000000; -- 100 MHz o 125 MHz
 frecuencia_pwm<=50;
 
 frecuencia_pwm_flancos<=frecuencia_clk/frecuencia_pwm; --anchura total del opwm en pulsos, a 50 Hz son 20 ms
+
+tipo_servo<="001";
 
 --la posición en grados va de 0 a 180 grados de la posición final del servo, no gira mas
 process(selector)
@@ -70,15 +73,15 @@ when others =>  pwm_tope<=0;
 end case;
 end process;                
 
-process(clk, reset)
+process(clk, inicio)
 begin
 if clk='1' and clk'event then
-    if reset='1' then
+    if inicio='1' then
         estado<=EST_RESET;
         contador_base<=0;
     else        
         case estado is
-        --estado reset
+        --estado inicio
         when EST_RESET =>   contador_base<=0;
                         estado<=START;
 

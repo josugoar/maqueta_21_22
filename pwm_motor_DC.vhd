@@ -33,7 +33,7 @@ begin
 selector<=to_integer(unsigned(speed));
 frecuencia_pwm<=200; --este valor controla la frecuencia del pwm
 
-process(selector, pwm)
+process(selector, pwm, sentido)
 begin
 if sentido = '0' then --giro normal
     pwm_motor_DC(1)<='0';

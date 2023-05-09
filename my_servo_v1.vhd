@@ -24,8 +24,6 @@ signal frecuencia_pwm: integer range 0 to 1000; -- en Hz
 type nombre_estados is (EST_RESET, START, A_UNO, A_CERO, T2);
 signal estado: nombre_estados;
 
-signal tipo_servo: std_logic_vector (2 downto 0);
-
 
 begin
 
@@ -33,8 +31,6 @@ frecuencia_clk<=100000000; -- 100 MHz o 125 MHz
 frecuencia_pwm<=50;
 
 frecuencia_pwm_flancos<=frecuencia_clk/frecuencia_pwm; --anchura total del opwm en pulsos, a 50 Hz son 20 ms
-
-tipo_servo<="001";
 
 --la posición en grados va de 0 a 180 grados de la posición final del servo, no gira mas
 process(selector)
@@ -58,20 +54,8 @@ end case;
 end process;
 
 
--- Duracion del pulso
-process(tipo_servo)
-begin
-case tipo_servo is
-when "000" => -- pulso de 1 ms a 2 ms
-                pwm_tope<=100000+555*pos_grados;
-when "001" => -- pulso de 0,5 ms a 2,5 ms SG90
-                pwm_tope<=50000+1111*pos_grados;
-when "010" => -- pulso de 0,3 ms a 2,3 ms FUTABA 3003
-                pwm_tope<=30000+1111*pos_grados;
--- en los casos libres se pueden poner otros pulsos                
-when others =>  pwm_tope<=0;
-end case;
-end process;                
+-- pulso de 0,5 ms a 2,5 ms SG90
+pwm_tope<=50000+1111*pos_grados;
 
 process(clk, inicio)
 begin

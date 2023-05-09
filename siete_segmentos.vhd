@@ -3,24 +3,24 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 use IEEE.std_logic_unsigned.all;
 
-entity siete_segmentos is
+entity segmentos is
 port(
 clk: in std_logic;
 inicio: in std_logic;
 segmentos: out std_logic_vector (6 downto 0);
 enable_seg: out std_logic_vector (3 downto 0);
-sal_mux_0: in std_logic_vector (3 downto 0);
-sal_mux_1: in std_logic_vector (3 downto 0);
-sal_mux_2: in std_logic_vector (3 downto 0);
-sal_mux_3: in std_logic_vector (3 downto 0);
+unidades: in std_logic_vector (3 downto 0);
+decenas: in std_logic_vector (3 downto 0);
+centenas: in std_logic_vector (3 downto 0);
+millares: in std_logic_vector (3 downto 0)
 );
 
-end siete_segmentos;
+end segmentos;
 
-architecture Behavioral of siete_segmentos is
+architecture Behavioral of segmentos is
 
 signal enable_aux: std_logic_vector (3 downto 0);
-signal cont_base_enable: integer range 0 to 10000000;
+signal base_enable: integer range 0 to 10000000;
 signal sal_mux: std_logic_vector (3 downto 0);
 
 begin
@@ -28,12 +28,12 @@ begin
 process(inicio, clk)
 begin
 if inicio='1' then
-   cont_base_enable<=0;
+   base_enable<=0;
 elsif rising_edge(clk) then
-      if cont_base_enable=100000 then
-         cont_base_enable<=0;
+      if base_enable=100000 then
+         base_enable<=0;
       else
-         cont_base_enable<=cont_base_enable+1;
+         base_enable<=base_enable+1;
       end if;
 end if;
 end process;
@@ -43,7 +43,7 @@ begin
 if inicio='1' then
    enable_aux<="1110";
 elsif rising_edge(clk) then
-    if cont_base_enable=100000 then
+    if base_enable=100000 then
 	      enable_aux<=enable_aux(2 downto 0)&enable_aux(3);
     end if;
 end if;
@@ -51,13 +51,13 @@ end process;
 
 enable_seg<=enable_aux;
 
-process(enable_aux, cont_unidades, cont_decenas)
+process(enable_aux, unidades, decenas, centenas, millares)
 begin
 case enable_aux is
-when "1110" => sal_mux<=sal_mux_0;
-when "1101" => sal_mux<=sal_mux_1;
-when "1011" => sal_mux<=sal_mux_2;
-when "0111" => sal_mux<=sal_mux_3;
+when "1110" => sal_mux<=unidades;
+when "1101" => sal_mux<=decenas;
+when "1011" => sal_mux<=centenas;
+when "0111" => sal_mux<=millares;
 when others => sal_mux<="0000";
 end case;
 end process;

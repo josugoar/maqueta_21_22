@@ -6,18 +6,20 @@ use IEEE.std_logic_signed.all;
 entity pwm_motor_DC is
 port(
 clk: in std_logic;
-inicio: in std_logic;
-speed: in std_logic_vector (3 downto 0);
-sentido: in std_logic;
-pwm_motor_DC: out std_logic_vector (1 downto 0)
+btn: in std_logic;
+sw: in std_logic_vector (4 downto 0);
+pwm_motor_DC: out std_logic;
+sentido_motor_DC: out std_logic;
+led: out std_logic_vector (6 downto 0)
 );
 
 end pwm_motor_DC;
 
 architecture Behavioral of pwm_motor_DC is
 
+signal reset: std_logic;
 signal pwm: std_logic;
-signal selector: integer range 0 to 10;
+signal selector: integer range -10 to 10;
 signal duty_cycle: integer range 0 to 100;
 signal duty_cycle_aux: integer range 0 to 100;
 signal contador_aux_duty_cycle: integer range 0 to 500000; -- 200 Hz
@@ -30,29 +32,31 @@ signal frecuencia_pwm_flancos: integer range 0 to 100000000;
 
 begin
 
-selector<=to_integer(unsigned(speed));
+reset<=btn;
+selector<=to_integer(signed(sw));
+led<=std_logic_vector(to_unsigned(duty_cycle, 7));
 frecuencia_pwm<=200; --este valor controla la frecuencia del pwm
 
-process(selector, pwm, sentido)
+process(selector, pwm)
 begin
-if sentido = '0' then --giro normal
-    pwm_motor_DC(1)<='0';
-    pwm_motor_DC(0)<=pwm; --para llevar la señal al motor
+if selector > 0 then --giro normal
+    sentido_motor_DC<='0';
+    pwm_motor_DC<=pwm; --para llevar la señal al motor
     duty_cycle_aux<=selector*10;
 else
-    pwm_motor_DC(1)<=pwm;
-    pwm_motor_DC(0)<='0'; --para llevar la señal al motor
-    duty_cycle_aux<=selector*10;
+    sentido_motor_DC<=pwm;
+    pwm_motor_DC<='0'; --para llevar la señal al motor
+    duty_cycle_aux<=(-selector)*10;
 end if;
 end process;
 
 -- Mientras el duty_cycle no cambie, mantiene su valor, pero cuando cambie selector y con´el
 -- el duty_cycle, entonces llegará al nuevo valor de 1% en 1%, y no de 10%, lo hace una 
 -- velocidad de incremento de 200 Hz (como el pwm)
-process(clk, inicio)
+process(clk, reset)
 begin
 if clk='1' and clk'event then
-    if inicio='1' then
+    if reset='1' then
         duty_cycle<=0;
     else
         if contador_aux_duty_cycle=0 then
@@ -69,10 +73,10 @@ end if;
 end process;
 
 -- contador para generar una señal de 200 Hz para incrementar/decrementar el duty cycle
-process(clk, inicio)
+process(clk, reset)
 begin
 if clk='1' and clk'event then
-    if inicio='1' then
+    if reset='1' then
         contador_aux_duty_cycle<=0;
     else
         if contador_aux_duty_cycle=500000 then
@@ -101,12 +105,12 @@ end process;
 process(clk)
 begin
 if rising_edge(clk) then
-    if inicio='1' then
+    if reset='1' then
         estado<="000";
 	   contador_base<=0;
     else        
         case estado is
-        --estado inicio
+        --estado reset
         when "000" =>   contador_base<=0;
                         if  duty_cycle=0 then
                             estado<="001";

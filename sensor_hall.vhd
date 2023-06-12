@@ -1,105 +1,116 @@
 library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.numeric_std.all;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
 
 entity sensor_hall is
 Port ( 
-clk: in std_logic;
-inicio: in std_logic;
-sensor_hall_verde: in std_logic;
-sensor_hall_azul: in std_logic;
-rpm: out std_logic_vector (7 downto 0);
-sentido: out std_logic
+clk : in std_logic;
+reset : in std_logic ;
+sentido : out std_logic;
+a : in std_logic ;
+b : in std_logic ;
+led : out std_logic_vector(7 downto 0)
+
 );
 end sensor_hall;
 
 architecture Behavioral of sensor_hall is
 
-signal hall: std_logic_vector (1 downto 0);
+signal rpm : integer range 0 to 600000;
 
-signal cont_base: integer range 0 to 100;
+signal estado : std_logic_vector(2 downto 0);
+signal cont_base : integer range 0 to 100;
+signal cont : integer range 0 to 60000;
+signal hall : std_logic_vector( 1 downto 0);
 
-signal estado: std_logic_vector (2 downto 0);
-signal cont_micros: integer range 0 to 60000;
+signal aux_rpm : integer range 0 to 600000;
+signal hallData : std_logic_vector (7 downto 0);
 
 begin
 
-hall <= sensor_hall_verde & sensor_hall_azul;
+hall <= a&b;
+led <= hallData;
 
-process(clk, inicio)
+process(reset, clk)
 begin
-if inicio = '1' then
-   cont_base <= 0;
+if reset='1' then
+   cont_base<=0;
 elsif rising_edge(clk) then
-      if cont_base = 100 then
-         cont_base <= 0;
+      if cont_base=100 then
+         cont_base<=0;
       else
-         cont_base <= cont_base + 1;
+         cont_base <=cont_base +1;
       end if;
 end if;
 end process;
 
-process(clk, inicio)
+--- Process para hallDC
+--- Cuenta las revoluciones del motor cada segundo y luego las pasa a la variable rev_per_seg
+process(clk, reset)
 begin
-if inicio = '1' then
-    cont_micros <= 0;
-    rpm <= "00000000";
-    sentido <= '0';
-    estado <= "000";
-elsif rising_edge(clk) then
+   if reset='1' then
+        estado <= "000";
+    elsif rising_edge(clk) then
     if cont_base = 100 then
         case estado is
-        when "000" =>
-            cont_micros <= 0;
-            estado <= "001";
-        when "001" =>
-            if cont_micros = 60000 then
-                cont_micros <= 0;
-                estado <= "001";
-            elsif hall = "00" then
-                cont_micros <= cont_micros + 1;
-                estado <= "001";
-            elsif hall = "01" then
-                cont_micros <= cont_micros + 1;
+            when "000" => -- Estado_hall inicial
+                cont <= 0;
+                rpm <= 0;
                 sentido <= '0';
-                estado <= "010";
-            elsif hall = "10" then
-                cont_micros <= cont_micros + 1;
-                sentido <= '1';
-                estado <= "011";
-            end if;
-        when "010" =>
-            if cont_micros = 60000 then    
-                cont_micros <= 0;
                 estado <= "001";
-            elsif hall /= "00" then
-                cont_micros <= cont_micros + 1;
-                estado <= "010";
-            elsif hall = "00" then
-                cont_micros <= cont_micros + 1;
-                estado <= "100";
-            end if;
-         when "011" =>
-            if cont_micros >= 60000 then    
-                cont_micros <= 0;
-                estado <= "001"; 
-            elsif hall /= "00" then
-                cont_micros <= cont_micros + 1;
-                estado <= "010";
-            elsif hall = "00" then
-                cont_micros <= cont_micros + 1;
-                estado <= "100";
-            end if;
-        when "100" =>
-            cont_micros <= 0;
-            rpm <= std_logic_vector(to_unsigned(60000000 / (cont_micros * 8 * 120), 8));
-            estado <= "001";  
-        when others =>
-            cont_micros <= 0;
-            estado <= "000";
+            when "001" =>
+                if cont >= 60000 then
+                    rpm <= 0;
+                    cont <= 0;
+                    estado <= "001";
+                elsif hall = "00" then
+                    cont <= cont + 1;
+                    estado <= "001";
+                elsif hall = "01" then
+                    cont <= cont + 1;
+                    sentido <= '0'; -- Sentido de giro positivo
+                    estado <= "010";
+                elsif hall = "10" then
+                    cont <= cont + 1;
+                    sentido <= '1'; -- Sentido de giro negativo
+                    estado <= "011";
+                end if;      
+            when "010" =>
+               if hall = "01" then
+                    cont <= cont + 1;
+                    estado <= "010";
+                elsif hall = "00" then
+                    cont <= cont + 1;
+                    estado <= "100";
+                elsif cont >= 60000 then    
+                    rpm <= 0;
+                    cont <= 0;
+                    estado <= "001";
+                end if;      
+             when "011" =>
+                if hall = "01" then
+                    cont <= cont + 1;
+                    estado <= "010";
+                elsif hall = "00" then
+                    cont <= cont + 1;
+                    estado <= "100";
+                elsif cont >= 60000 then    
+                    rpm <= 0;
+                    cont <= 0;
+                    estado <= "001"; 
+                end if;
+            when "100" =>
+                rpm <= (60000000 / (cont * 8 * 120));
+                cont <= 0;
+                estado <= "001";  
+            when others =>
+                estado <= "000";
         end case;
     end if;
-end if;
+    end if;
+
+hallData <= std_logic_vector(to_unsigned(rpm, 8));
+
 end process;
 
 end Behavioral;

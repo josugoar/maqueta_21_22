@@ -217,7 +217,7 @@ end if;
 end process;
 
 
-process(modo_suma, modo_resta)
+process(clk, inicio)
 begin
 if inicio='1' then
 modo_aux<="00";

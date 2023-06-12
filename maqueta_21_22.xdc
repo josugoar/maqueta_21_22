@@ -24,11 +24,6 @@ set_property PACKAGE_PIN W16 [get_ports {speed[2]}]
 	set_property IOSTANDARD LVCMOS33 [get_ports {speed[2]}]
 set_property PACKAGE_PIN W17 [get_ports {speed[3]}]					
 	set_property IOSTANDARD LVCMOS33 [get_ports {speed[3]}]
-
-set_property PACKAGE_PIN W14 [get_ports {que_ver[0]}]					
-	set_property IOSTANDARD LVCMOS33 [get_ports {que_ver[0]}]
-set_property PACKAGE_PIN W13 [get_ports {que_ver[1]}]					
-	set_property IOSTANDARD LVCMOS33 [get_ports {que_ver[1]}]
 	
 set_property PACKAGE_PIN R2 [get_ports {sentido}]		
 	set_property IOSTANDARD LVCMOS33 [get_ports {sentido}]
@@ -131,9 +126,6 @@ set_property PACKAGE_PIN N17 [get_ports {FC1}]
 ##Sch name = JC9
 set_property PACKAGE_PIN P17 [get_ports {FC2}]					
 	set_property IOSTANDARD LVCMOS33 [get_ports {FC2}]
-##Sch name = JB2	
-set_property PACKAGE_PIN A16 [get_ports {calefactor}]					
-    set_property IOSTANDARD LVCMOS33 [get_ports {calefactor}]
 ##Sch name = JC8
 set_property PACKAGE_PIN M19 [get_ports trigger]                    
     set_property IOSTANDARD LVCMOS33 [get_ports trigger]

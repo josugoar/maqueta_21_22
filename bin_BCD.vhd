@@ -87,7 +87,7 @@ elsif rising_edge(clk) then
     end if;
 end if;
 end process;
---fin de la activaciÃ³n de los siete seg
+--fin de la activación de los siete seg
 
 enable_seg<=enable_aux;
 

@@ -41,17 +41,17 @@ process(selector, pwm)
 begin
 if selector > 0 then --giro normal
     sentido_motor_DC<='0';
-    pwm_motor_DC<=pwm; --para llevar la se�al al motor
+    pwm_motor_DC<=pwm; --para llevar la seÃƒÂ±al al motor
     duty_cycle_aux<=selector*10;
 else
     sentido_motor_DC<=pwm;
-    pwm_motor_DC<='0'; --para llevar la se�al al motor
+    pwm_motor_DC<='0'; --para llevar la seÃƒÂ±al al motor
     duty_cycle_aux<=(-selector)*10;
 end if;
 end process;
 
--- Mientras el duty_cycle no cambie, mantiene su valor, pero cuando cambie selector y con�el
--- el duty_cycle, entonces llegar� al nuevo valor de 1% en 1%, y no de 10%, lo hace una 
+-- Mientras el duty_cycle no cambie, mantiene su valor, pero cuando cambie selector y conÃ‚Â´el
+-- el duty_cycle, entonces llegarÃƒÂ¡ al nuevo valor de 1% en 1%, y no de 10%, lo hace una 
 -- velocidad de incremento de 200 Hz (como el pwm)
 process(clk, reset)
 begin
@@ -72,7 +72,7 @@ if clk='1' and clk'event then
 end if;
 end process;
 
--- contador para generar una se�al de 200 Hz para incrementar/decrementar el duty cycle
+-- contador para generar una seÃƒÂ±al de 200 Hz para incrementar/decrementar el duty cycle
 process(clk, reset)
 begin
 if clk='1' and clk'event then
@@ -88,7 +88,7 @@ if clk='1' and clk'event then
 end if;
 end process;
 
--- frecuencia_pwm_flancos indica cu�ntos flancos del reloj del sistema hacen
+-- frecuencia_pwm_flancos indica cuÃƒÂ¡ntos flancos del reloj del sistema hacen
 -- falta para generar el periodo de PWM contando flancos flancos.
 -- Por ejemplo para 100 Hz debe contar 1250000 flancos
 process(frecuencia_pwm)
@@ -96,8 +96,8 @@ begin
 frecuencia_pwm_flancos<=100000000/frecuencia_pwm;
 end process;
 
--- pwm_tope expresa en flancos cu�ntos flancos debe estar la salida a 1
-process(duty_cycle)
+-- pwm_tope expresa en flancos cuÃƒÂ¡ntos flancos debe estar la salida a 1
+process(frecuencia_pwm, duty_cycle)
 begin
 pwm_tope<=100000000/frecuencia_pwm*duty_cycle/100;
 end process;

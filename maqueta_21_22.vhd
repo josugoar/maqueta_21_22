@@ -15,7 +15,6 @@ segmentos: out std_logic_vector (6 downto 0);
 enable_seg: out std_logic_vector (3 downto 0);
 FC1: in std_logic;
 FC2: in std_logic;
-calefactor: out std_logic;
 led: out std_logic_vector (1 downto 0);
 sentido: in std_logic;
 pwm_motor_DC: out std_logic_vector(1 downto 0);
@@ -31,7 +30,6 @@ trigger: out std_logic;
 crc_en	: OUT		STD_LOGIC;
 ds_data_bus	: INOUT	STD_LOGIC;
 speed: in std_logic_vector (3 downto 0);
-que_ver: in std_logic_vector (1 downto 0);
 servo_pwm: out std_logic;
 modo: out std_logic_vector(1 downto 0)
 );
@@ -76,8 +74,6 @@ led(1)<=FC2;
 led(0)<=FC1;
 
 modo <= mode;
-
-calefactor <= '0';
 
 rpm_salida <= rpm_visualize;
 
@@ -255,11 +251,11 @@ port map (
 work_sensHall : entity work.sensor_hall
 port map (
   clk => clk,
-  inicio => inicio,
+  reset => inicio,
   sentido => sentido_salida,
-  sensor_hall_verde => sensor_hall_verde,
-  sensor_hall_azul => sensor_hall_azul,
-  rpm => rpm_visualize
+  a => sensor_hall_verde,
+  b => sensor_hall_azul,
+  led => rpm_visualize
 );
 
 end Behavioral;

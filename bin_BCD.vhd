@@ -45,21 +45,23 @@ if inicio='1' then
     centenas<=0;
     millares<=0;
 elsif rising_edge(clk) then
-    if tipo = "00" then
-        unidades <= num_aux mod 10;
-        decenas <= (num_aux/10)mod 10;
-        centenas <= (num_aux/100)mod 10;
-        millares <= (num_aux/1000)mod 10;
-     elsif tipo = "01" then
-        unidades <= num_aux1 mod 10;
-        decenas <= (num_aux1/10)mod 10;
-        centenas <= num_aux2 mod 10;
-        millares <= (num_aux2/10)mod 10;
-     else
-        unidades <= num_aux mod 10;
-        decenas <= (num_aux/10)mod 10;
-        centenas <= (num_aux/100)mod 10;
-        millares <= (num_aux/1000)mod 10;
+    if enable = '1' then
+        if tipo = "00" then
+            unidades <= num_aux mod 10;
+            decenas <= (num_aux/10)mod 10;
+            centenas <= (num_aux/100)mod 10;
+            millares <= (num_aux/1000)mod 10;
+         elsif tipo = "01" then
+            unidades <= num_aux1 mod 10;
+            decenas <= (num_aux1/10)mod 10;
+            centenas <= num_aux2 mod 10;
+            millares <= (num_aux2/10)mod 10;
+         else
+            unidades <= num_aux mod 10;
+            decenas <= (num_aux/10)mod 10;
+            centenas <= (num_aux/100)mod 10;
+            millares <= (num_aux/1000)mod 10;
+         end if;
      end if;
 end if;
 end process;                                              
@@ -87,12 +89,12 @@ elsif rising_edge(clk) then
     end if;
 end if;
 end process;
---fin de la activación de los siete seg
+--fin de la activacion de los siete seg
 
 enable_seg<=enable_aux;
 
 --multiplexado de las entradas al 7-seg
-process(enable_aux, unidades, decenas)
+process(enable_aux, unidades, decenas, centenas, millares)
 begin
 case enable_aux is
 when "1110" => sal_mux<=unidades;

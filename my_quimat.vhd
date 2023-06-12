@@ -30,9 +30,9 @@ begin
 
 frecuencia_paso_paso_entero<=to_integer(unsigned(frecuencia_paso_paso));
 
-tope_frecuencia_paso_paso<=(100000000/frecuencia_paso_paso_entero)/2;
+tope_frecuencia_paso_paso<=(100000000/(frecuencia_paso_paso_entero*40))/2;
 
-process(clk)
+process(clk, reset)
 begin
 if reset='1' then
     reloj_paso_paso<=0;

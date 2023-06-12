@@ -56,9 +56,9 @@ end process;
 --- Cuenta las revoluciones del motor cada segundo y luego las pasa a la variable rev_per_seg
 process(clk, reset)
 begin
-   if reset='1' then
-        estado <= "000";
-    elsif rising_edge(clk) then
+if reset='1' then
+    estado <= "000";
+elsif rising_edge(clk) then
     if cont_base = 100 then
         case estado is
             when "000" => -- Estado_hall inicial
@@ -115,10 +115,10 @@ begin
                 estado <= "000";
         end case;
     end if;
-    end if;
-
-hallData <= std_logic_vector(to_unsigned(rpm, 8));
+end if;
 
 end process;
+
+hallData <= std_logic_vector(to_unsigned(rpm, 8));
 
 end Behavioral;

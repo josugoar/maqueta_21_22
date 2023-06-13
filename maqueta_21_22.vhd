@@ -151,7 +151,8 @@ clk => clk,
 inicio => inicio,
 pulsador_suma => button_up,
 pulsador_resta => button_down,
-maximo =>"10",
+maximo_ver =>"11",
+maximo_modo => "10",
 contador => visualizacion,
 modo => mode
 );

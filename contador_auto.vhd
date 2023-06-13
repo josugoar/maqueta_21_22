@@ -9,7 +9,8 @@ clk: in std_logic;
 inicio: in std_logic;
 pulsador_suma: in std_logic;
 pulsador_resta: in std_logic;
-maximo: in std_logic_vector(1 downto 0);
+maximo_modo: in std_logic_vector(1 downto 0);
+maximo_ver: in std_logic_vector(1 downto 0);
 contador: out std_logic_vector(1 downto 0);
 modo: out std_logic_vector(1 downto 0)
 );
@@ -39,9 +40,9 @@ begin
 contador <= contador_aux;
 modo <= modo_aux;
 
-process(inicio, clk)
+process(inicio, clk, puls_sal_resta)
 begin
-if inicio='1' then
+if inicio='1' or puls_sal_resta = '1' then
    	estado_suma <="0000";
 	cont_filtro_suma<=0;
 	cont_espera_suma<=0;
@@ -128,9 +129,9 @@ end if;
 end process; 
 
 
-process(inicio, clk)
+process(inicio, clk, puls_sal_suma)
 begin
-if inicio='1' then
+if inicio='1' or puls_sal_suma = '1' then
    	estado_resta<="0000";
 	cont_filtro_resta<=0;
 	cont_espera_resta<=0;
@@ -222,7 +223,7 @@ begin
 if inicio='1' then
 modo_aux<="00";
 elsif rising_edge(clk) then
-if modo_suma = '1' and modo_aux < maximo then
+if modo_suma = '1' and modo_aux < maximo_modo then
 modo_aux <= modo_aux + 1;
 elsif modo_resta = '1' and modo_aux > "00"  then
 modo_aux <= modo_aux - 1;
@@ -272,8 +273,8 @@ if inicio='1' then
 contador_aux<="00";
 elsif rising_edge(clk) then
 	if puls_sal_suma='1' then
-		if contador_aux=maximo then
-         		contador_aux<=maximo;
+		if contador_aux=maximo_ver then
+         		contador_aux<=maximo_ver;
      		else
          		contador_aux<=contador_aux+1;
       	end if;
